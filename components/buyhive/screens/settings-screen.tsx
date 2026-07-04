@@ -2,7 +2,6 @@
 
 import { useState } from "react"
 import {
-  ArrowLeft,
   Bell,
   ChevronRight,
   Globe,
@@ -13,6 +12,9 @@ import {
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useApp } from "../app-context"
+import { useAppNav } from "@/hooks/use-app-nav"
+import { BackButton } from "../back-button"
+import { routes } from "@/lib/constants/routes"
 import { cn } from "@/lib/utils"
 
 function Toggle({
@@ -32,14 +34,14 @@ function Toggle({
       aria-label={label}
       onClick={() => onChange(!checked)}
       className={cn(
-        "relative h-6 w-11 shrink-0 rounded-full transition-colors",
-        checked ? "bg-primary" : "bg-muted-foreground/30",
+        "relative h-7 w-12 shrink-0 rounded-full border border-border/70 p-0.5 transition-all",
+        checked ? "bg-primary" : "bg-muted-foreground/25",
       )}
     >
       <span
         className={cn(
-          "absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform",
-          checked ? "translate-x-[22px]" : "translate-x-0.5",
+          "absolute top-0.5 h-6 w-6 rounded-full border border-border/60 bg-background shadow-sm transition-transform",
+          checked ? "translate-x-[20px]" : "translate-x-0.5",
         )}
       />
     </button>
@@ -47,21 +49,15 @@ function Toggle({
 }
 
 export function SettingsScreen() {
-  const { goBack, navigate, theme, toggleTheme, pushToast } = useApp()
+  const { theme, toggleTheme, pushToast } = useApp()
+  const { goOnboarding, goPrivacy, goHelp } = useAppNav()
   const [notifs, setNotifs] = useState(true)
   const [nearby, setNearby] = useState(true)
 
   return (
-    <div className="flex h-full flex-col">
+    <div className="bh-page-enter flex h-full flex-col">
       <header className="flex items-center gap-3 border-b border-border bg-card px-4 py-3">
-        <button
-          type="button"
-          onClick={goBack}
-          aria-label="Go back"
-          className="grid h-9 w-9 place-items-center rounded-full text-foreground"
-        >
-          <ArrowLeft className="h-4 w-4" />
-        </button>
+        <BackButton fallback={routes.profile} className="border-0 bg-transparent shadow-none" />
         <h1 className="text-lg font-bold text-foreground">Settings</h1>
       </header>
 
@@ -82,10 +78,10 @@ export function SettingsScreen() {
         </Group>
 
         <Group title="Account">
-          <Row icon={ShieldCheck} label="Privacy & security" onClick={() => pushToast("Opening privacy", "info")}>
+          <Row icon={ShieldCheck} label="Privacy & security" onClick={() => goPrivacy()}>
             <ChevronRight className="h-4 w-4 text-muted-foreground" />
           </Row>
-          <Row icon={HelpCircle} label="Help & support" onClick={() => pushToast("Opening support", "info")}>
+          <Row icon={HelpCircle} label="Help & support" onClick={() => goHelp()}>
             <ChevronRight className="h-4 w-4 text-muted-foreground" />
           </Row>
         </Group>
@@ -95,7 +91,7 @@ export function SettingsScreen() {
           className="h-12 w-full gap-2 border-error/30 bg-transparent text-error hover:bg-error/10 hover:text-error"
           onClick={() => {
             pushToast("Logged out", "info")
-            navigate("onboarding")
+            goOnboarding()
           }}
         >
           <LogOut className="h-4 w-4" /> Log out

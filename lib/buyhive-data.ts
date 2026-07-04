@@ -2,8 +2,8 @@ export type Category =
   | "Electronics"
   | "Books"
   | "Components"
-  | "Subscription"
   | "Food"
+  | "Others"
 
 export type GroupStatus = "active" | "pending" | "completed" | "created"
 
@@ -52,9 +52,9 @@ export function money(amount: number) {
 export const categories: { label: Category; icon: string }[] = [
   { label: "Electronics", icon: "cpu" },
   { label: "Books", icon: "book" },
-  { label: "Components", icon: "plug" },
-  { label: "Subscription", icon: "play" },
   { label: "Food", icon: "utensils" },
+  { label: "Components", icon: "plug" },
+  { label: "Others", icon: "layers" },
 ]
 
 export const products: Product[] = [
@@ -124,7 +124,7 @@ export const products: Product[] = [
     id: "streaming",
     name: "Streaming Premium (4 seats)",
     image: "/products/streaming.png",
-    category: "Subscription",
+    category: "Others",
     originalPrice: 1100,
     groupPrice: 280,
     maxMembers: 4,
@@ -182,8 +182,29 @@ export const products: Product[] = [
   },
 ]
 
+const CREATED_PRODUCTS_KEY = "buyhive-created-products"
+
+function readCreatedProducts(): Product[] {
+  if (typeof window === "undefined") return []
+
+  try {
+    const raw = window.localStorage.getItem(CREATED_PRODUCTS_KEY)
+    return raw ? (JSON.parse(raw) as Product[]) : []
+  } catch {
+    return []
+  }
+}
+
+export function writeCreatedProduct(product: Product) {
+  if (typeof window === "undefined") return
+
+  const existing = readCreatedProducts()
+  const next = [product, ...existing.filter((p) => p.id !== product.id)]
+  window.localStorage.setItem(CREATED_PRODUCTS_KEY, JSON.stringify(next))
+}
+
 export function getProduct(id: string) {
-  return products.find((p) => p.id === id)
+  return [...products, ...readCreatedProducts()].find((p) => p.id === id)
 }
 
 export function savings(p: Product) {

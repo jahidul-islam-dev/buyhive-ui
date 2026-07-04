@@ -1,7 +1,8 @@
 "use client"
 
-import { useEffect, useState } from "react"
-import { Bell, ChevronRight, Sparkles, TrendingUp } from "lucide-react"
+import { useEffect, useMemo, useState } from "react"
+import { Bell, ChevronRight, Plus, Sparkles, TrendingUp, Users } from "lucide-react"
+import Link from "next/link"
 import {
   currentUser,
   money,
@@ -10,28 +11,48 @@ import {
   type Category,
 } from "@/lib/buyhive-data"
 import { useApp } from "../app-context"
+import { useAppNav } from "@/hooks/use-app-nav"
+import { routes } from "@/lib/constants/routes"
 import { Logo } from "../logo"
 import { SearchBar, CategoryChips } from "../search-chips"
 import { ProductCard } from "../product-card"
 import { SectionHeader } from "../primitives"
-import { GridSkeleton } from "../states"
+import { EmptyState, GridSkeleton } from "../states"
 import { PullToRefresh } from "../pull-to-refresh"
 
 export function HomeScreen() {
-  const { navigate, pushToast } = useApp()
+  const { pushToast } = useApp()
+  const { goExplore, goCreate } = useAppNav()
   const [loading, setLoading] = useState(true)
   const [category, setCategory] = useState<Category | "All">("All")
+  const [query, setQuery] = useState("")
 
   useEffect(() => {
     const t = setTimeout(() => setLoading(false), 900)
     return () => clearTimeout(t)
   }, [])
 
-  const trending = products.slice(0, 5)
-  const nearComplete = products.filter((p) => progress(p) >= 70)
-  const recommended = products.filter((p) => p.aiReason)
-  const filtered =
-    category === "All" ? products : products.filter((p) => p.category === category)
+  const filtered = useMemo(() => {
+    const normalizedQuery = query.trim().toLowerCase()
+
+    return products.filter((p) => {
+      const matchesCategory = category === "All" || p.category === category
+      const matchesQuery =
+        normalizedQuery.length === 0 ||
+        p.name.toLowerCase().includes(normalizedQuery) ||
+        p.description.toLowerCase().includes(normalizedQuery) ||
+        p.category.toLowerCase().includes(normalizedQuery)
+
+      return matchesCategory && matchesQuery
+    })
+  }, [category, query])
+
+  const trending = filtered.slice(0, 4)
+  const recentlyJoined = [...filtered]
+    .sort((a, b) => b.joinedMembers - a.joinedMembers)
+    .slice(0, 4)
+  const recommended = filtered.filter((p) => p.aiReason).slice(0, 4)
+  const nearComplete = filtered.filter((p) => progress(p) >= 70).slice(0, 4)
 
   async function refresh() {
     await new Promise((r) => setTimeout(r, 900))
@@ -39,31 +60,25 @@ export function HomeScreen() {
   }
 
   return (
-    <div className="flex h-full flex-col">
+    <div className="bh-page-enter flex h-full flex-col">
       <header className="flex items-center justify-between border-b border-border bg-card px-5 py-3">
         <Logo size="sm" />
         <div className="flex items-center gap-2">
-          <button
-            type="button"
-            onClick={() => navigate("notifications")}
+          <Link
+            href={routes.notifications}
             aria-label="Notifications"
             className="relative grid h-9 w-9 place-items-center rounded-full border border-border text-foreground"
           >
             <Bell className="h-4 w-4" />
             <span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-error ring-2 ring-card" />
-          </button>
+          </Link>
           <button
             type="button"
-            onClick={() => navigate("profile")}
-            aria-label="Profile"
-            className="h-9 w-9 overflow-hidden rounded-full border border-border"
+            onClick={() => goCreate()}
+            aria-label="Create group"
+            className="grid h-9 w-9 place-items-center rounded-full bg-primary text-primary-foreground shadow-md shadow-primary/25"
           >
-            <img
-              src={currentUser.avatar || "/placeholder.svg"}
-              alt=""
-              className="h-full w-full object-cover"
-              crossOrigin="anonymous"
-            />
+            <Plus className="h-4 w-4" />
           </button>
         </div>
       </header>
@@ -75,11 +90,15 @@ export function HomeScreen() {
             <h1 className="text-2xl font-bold text-foreground">{currentUser.firstName} 👋</h1>
           </div>
 
-          <SearchBar readOnly onFocus={() => navigate("explore")} onChange={() => navigate("explore")} />
+          <SearchBar
+            placeholder="Search groups or deals"
+            value={query}
+            onChange={setQuery}
+          />
 
           <button
             type="button"
-            onClick={() => navigate("explore")}
+            onClick={() => goExplore()}
             className="flex w-full items-center justify-between rounded-2xl bg-primary p-4 text-left text-primary-foreground shadow-lg shadow-primary/20 transition-transform active:scale-[0.98]"
           >
             <div>
@@ -100,6 +119,16 @@ export function HomeScreen() {
 
           {loading ? (
             <GridSkeleton />
+          ) : filtered.length === 0 ? (
+            <EmptyState
+              icon={<Users className="h-7 w-7" />}
+              title={query.trim().length > 0 ? "No search results" : "No groups available in this category."}
+              body={
+                query.trim().length > 0
+                  ? "Try a different keyword or broaden your filters to discover more group buys."
+                  : "Try another category or check back soon for fresh deals and campus offers."
+              }
+            />
           ) : (
             <>
               <section>
@@ -107,7 +136,7 @@ export function HomeScreen() {
                   <div className="grid h-6 w-6 place-items-center rounded-md bg-accent text-accent-foreground">
                     <Sparkles className="h-3.5 w-3.5" />
                   </div>
-                  <h2 className="text-base font-bold text-foreground">Recommended for you</h2>
+                  <h2 className="text-base font-bold text-foreground">Recommended groups</h2>
                 </div>
                 <div className="-mx-5 flex gap-3 overflow-x-auto bh-no-scrollbar px-5">
                   {recommended.map((p) => (
@@ -125,7 +154,7 @@ export function HomeScreen() {
               <section>
                 <div className="mb-3 flex items-center gap-1.5">
                   <TrendingUp className="h-4 w-4 text-primary" />
-                  <h2 className="text-base font-bold text-foreground">Trending</h2>
+                  <h2 className="text-base font-bold text-foreground">Trending groups</h2>
                 </div>
                 <div className="-mx-5 flex gap-3 overflow-x-auto bh-no-scrollbar px-5">
                   {trending.map((p) => (
@@ -137,7 +166,16 @@ export function HomeScreen() {
               </section>
 
               <section>
-                <SectionHeader title="Near complete" action="See all" onAction={() => navigate("explore")} />
+                <SectionHeader title="Recently joined groups" />
+                <div className="grid grid-cols-2 gap-3">
+                  {recentlyJoined.map((p) => (
+                    <ProductCard key={p.id} product={p} />
+                  ))}
+                </div>
+              </section>
+
+              <section>
+                <SectionHeader title="Near complete" action="See all" onAction={() => goExplore()} />
                 <div className="grid grid-cols-2 gap-3">
                   {nearComplete.map((p) => (
                     <ProductCard key={p.id} product={p} />
@@ -146,7 +184,7 @@ export function HomeScreen() {
               </section>
 
               <section>
-                <SectionHeader title={category === "All" ? "All deals" : category} />
+                <SectionHeader title={category === "All" ? "All groups" : category} />
                 <div className="grid grid-cols-2 gap-3">
                   {filtered.map((p) => (
                     <ProductCard key={p.id} product={p} />
@@ -163,6 +201,15 @@ export function HomeScreen() {
           )}
         </div>
       </PullToRefresh>
+
+      <button
+        type="button"
+        onClick={() => goCreate()}
+        aria-label="Create group"
+        className="fixed bottom-24 right-5 z-40 grid h-14 w-14 place-items-center rounded-full bg-primary text-primary-foreground shadow-lg shadow-primary/25 transition-transform active:scale-95"
+      >
+        <Plus className="h-6 w-6" />
+      </button>
     </div>
   )
 }

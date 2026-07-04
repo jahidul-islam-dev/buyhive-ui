@@ -1,14 +1,18 @@
 "use client"
 
 import { type FormEvent, useState } from "react"
-import { ArrowLeft, Loader2, Lock, Mail } from "lucide-react"
+import { Loader2, Lock, Mail } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useApp } from "../app-context"
+import { useAppNav } from "@/hooks/use-app-nav"
+import { BackButton } from "../back-button"
+import { routes } from "@/lib/constants/routes"
 import { Logo } from "../logo"
 import { Field } from "../form-field"
 
 export function LoginScreen() {
-  const { navigate, goBack, pushToast } = useApp()
+  const { pushToast } = useApp()
+  const { goHome, goSignup } = useAppNav()
   const [loading, setLoading] = useState(false)
 
   function onSubmit(e: FormEvent) {
@@ -17,20 +21,13 @@ export function LoginScreen() {
     setTimeout(() => {
       setLoading(false)
       pushToast("Welcome back, Aryan!")
-      navigate("home")
+      goHome()
     }, 1100)
   }
 
   return (
-    <div className="flex h-full flex-col overflow-y-auto bh-no-scrollbar px-6 pb-6 pt-6">
-      <button
-        type="button"
-        onClick={goBack}
-        aria-label="Go back"
-        className="grid h-9 w-9 place-items-center rounded-full border border-border bg-card text-foreground"
-      >
-        <ArrowLeft className="h-4 w-4" />
-      </button>
+    <div className="bh-page-enter flex h-full flex-col overflow-y-auto bh-no-scrollbar px-6 pb-6 pt-6">
+      <BackButton fallback={routes.onboarding} />
 
       <div className="mt-6 flex flex-col items-center">
         <Logo size="lg" />
@@ -82,7 +79,7 @@ export function LoginScreen() {
         variant="outline"
         onClick={() => {
           pushToast("Signed in with Google")
-          navigate("home")
+          goHome()
         }}
         className="h-12 w-full gap-2 bg-transparent text-sm font-semibold"
       >
@@ -93,10 +90,10 @@ export function LoginScreen() {
         Don&apos;t have an account?{" "}
         <button
           type="button"
-          onClick={() => navigate("signup")}
+          onClick={() => goSignup()}
           className="font-semibold text-primary hover:underline"
         >
-          Sign Up
+          Register
         </button>
       </p>
     </div>

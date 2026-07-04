@@ -1,8 +1,9 @@
 "use client"
 
-import { PackageCheck, Truck, Users } from "lucide-react"
+import { useState } from "react"
+import { Loader2, PackageCheck, Truck, Users } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { useApp } from "../app-context"
+import { useAppNav } from "@/hooks/use-app-nav"
 import { Logo } from "../logo"
 
 const benefits = [
@@ -24,9 +25,16 @@ const benefits = [
 ]
 
 export function OnboardingScreen() {
-  const { navigate } = useApp()
+  const { goSignup, goLogin, goHome } = useAppNav()
+  const [pendingAction, setPendingAction] = useState<"signup" | "login" | "guest" | null>(null)
+
+  function navigateWithLoading(target: "signup" | "login" | "guest", action: () => void) {
+    setPendingAction(target)
+    window.setTimeout(() => action(), 300)
+  }
+
   return (
-    <div className="flex h-full flex-col overflow-y-auto bh-no-scrollbar px-6 pb-6 pt-8">
+    <div className="bh-page-enter flex h-full flex-col overflow-y-auto bh-no-scrollbar px-6 pb-6 pt-8">
       <div className="flex justify-center">
         <Logo size="lg" />
       </div>
@@ -63,22 +71,36 @@ export function OnboardingScreen() {
       </ul>
 
       <div className="mt-auto space-y-2.5 pt-8">
-        <Button className="h-12 w-full text-base font-semibold" onClick={() => navigate("signup")}>
-          Sign Up
+        <Button
+          className="h-12 w-full text-base font-semibold"
+          onClick={() => navigateWithLoading("signup", goSignup)}
+          disabled={pendingAction !== null}
+        >
+          {pendingAction === "signup" ? (
+            <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Opening register</>
+          ) : (
+            "Register"
+          )}
         </Button>
         <Button
           variant="outline"
           className="h-12 w-full bg-transparent text-base font-semibold"
-          onClick={() => navigate("login")}
+          onClick={() => navigateWithLoading("login", goLogin)}
+          disabled={pendingAction !== null}
         >
-          Login
+          {pendingAction === "login" ? (
+            <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Opening login</>
+          ) : (
+            "Log in"
+          )}
         </Button>
         <button
           type="button"
-          onClick={() => navigate("home")}
-          className="w-full py-2 text-sm font-medium text-muted-foreground hover:text-foreground"
+          onClick={() => navigateWithLoading("guest", goHome)}
+          disabled={pendingAction !== null}
+          className="w-full py-2 text-sm font-medium text-muted-foreground hover:text-foreground disabled:opacity-60"
         >
-          Continue as Guest
+          {pendingAction === "guest" ? "Loading home..." : "Continue as Guest"}
         </button>
       </div>
     </div>

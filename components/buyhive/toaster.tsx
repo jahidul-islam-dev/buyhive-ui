@@ -12,7 +12,7 @@ export function Toaster() {
         <div
           key={t.id}
           className={cn(
-            "bh-animate-fade-up pointer-events-auto flex w-full max-w-sm items-center gap-2.5 rounded-xl border px-3.5 py-2.5 shadow-lg",
+            "bh-animate-fade-up pointer-events-auto flex w-full max-w-sm items-center gap-2.5 rounded-2xl border px-3.5 py-2.5 shadow-lg",
             t.tone === "success" && "border-success/30 bg-success text-success-foreground",
             t.tone === "info" && "border-border bg-card text-card-foreground",
             t.tone === "error" && "border-error/30 bg-error text-error-foreground",

@@ -10,35 +10,11 @@ import {
   type ReactNode,
 } from "react"
 
-export type Screen =
-  | "splash"
-  | "onboarding"
-  | "login"
-  | "signup"
-  | "home"
-  | "explore"
-  | "product"
-  | "create"
-  | "groups"
-  | "chat"
-  | "notifications"
-  | "profile"
-  | "settings"
-
-export const TAB_SCREENS: Screen[] = ["home", "explore", "create", "groups", "profile"]
-
-type NavOptions = { productId?: string }
-
 type Toast = { id: number; message: string; tone: "success" | "info" | "error" }
 
 type AppState = {
-  screen: Screen
-  productId: string | null
-  history: Screen[]
   theme: "light" | "dark"
   toasts: Toast[]
-  navigate: (screen: Screen, opts?: NavOptions) => void
-  goBack: () => void
   toggleTheme: () => void
   pushToast: (message: string, tone?: Toast["tone"]) => void
   dismissToast: (id: number) => void
@@ -53,9 +29,6 @@ export function useApp() {
 }
 
 export function AppProvider({ children }: { children: ReactNode }) {
-  const [screen, setScreen] = useState<Screen>("splash")
-  const [productId, setProductId] = useState<string | null>(null)
-  const [history, setHistory] = useState<Screen[]>([])
   const [theme, setTheme] = useState<"light" | "dark">("light")
   const [toasts, setToasts] = useState<Toast[]>([])
 
@@ -63,24 +36,6 @@ export function AppProvider({ children }: { children: ReactNode }) {
     const root = document.documentElement
     root.classList.toggle("dark", theme === "dark")
   }, [theme])
-
-  const navigate = useCallback((next: Screen, opts?: NavOptions) => {
-    setScreen((prev) => {
-      setHistory((h) => (prev === next ? h : [...h, prev]))
-      return next
-    })
-    if (opts?.productId !== undefined) setProductId(opts.productId)
-  }, [])
-
-  const goBack = useCallback(() => {
-    setHistory((h) => {
-      if (h.length === 0) return h
-      const copy = [...h]
-      const prev = copy.pop()!
-      setScreen(prev)
-      return copy
-    })
-  }, [])
 
   const toggleTheme = useCallback(() => {
     setTheme((t) => (t === "light" ? "dark" : "light"))
@@ -100,18 +55,13 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   const value = useMemo<AppState>(
     () => ({
-      screen,
-      productId,
-      history,
       theme,
       toasts,
-      navigate,
-      goBack,
       toggleTheme,
       pushToast,
       dismissToast,
     }),
-    [screen, productId, history, theme, toasts, navigate, goBack, toggleTheme, pushToast, dismissToast],
+    [theme, toasts, toggleTheme, pushToast, dismissToast],
   )
 
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>

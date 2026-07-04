@@ -141,9 +141,11 @@
   * {
     @apply border-border outline-ring/50;
   }
+
   body {
     @apply bg-background text-foreground;
   }
+
   html {
     @apply font-sans;
   }
@@ -154,6 +156,7 @@
     opacity: 0;
     transform: translateY(12px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -165,20 +168,24 @@
     transform: scale(0.6);
     opacity: 0;
   }
+
   60% {
     transform: scale(1.08);
     opacity: 1;
   }
+
   100% {
     transform: scale(1);
   }
 }
 
 @keyframes bh-float {
+
   0%,
   100% {
     transform: translateY(0);
   }
+
   50% {
     transform: translateY(-8px);
   }
@@ -187,6 +194,30 @@
 @keyframes bh-shimmer {
   100% {
     transform: translateX(100%);
+  }
+}
+
+@keyframes bh-slide-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes bh-breathe {
+
+  0%,
+  100% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.02);
   }
 }
 
@@ -202,6 +233,27 @@
   animation: bh-float 3s ease-in-out infinite;
 }
 
+.bh-animate-slide-in {
+  animation: bh-slide-in 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.bh-animate-breathe {
+  animation: bh-breathe 2.2s ease-in-out infinite;
+}
+
+.bh-page-enter {
+  animation: bh-slide-in 0.35s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.bh-card-hover {
+  transition: transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
+}
+
+.bh-card-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 30px -16px rgba(15, 23, 42, 0.24);
+}
+
 .bh-skeleton {
   position: relative;
   overflow: hidden;
@@ -213,18 +265,17 @@
   position: absolute;
   inset: 0;
   transform: translateX(-100%);
-  background: linear-gradient(
-    90deg,
-    transparent,
-    color-mix(in oklab, var(--foreground) 8%, transparent),
-    transparent
-  );
+  background: linear-gradient(90deg,
+      transparent,
+      color-mix(in oklab, var(--foreground) 8%, transparent),
+      transparent);
   animation: bh-shimmer 1.4s infinite;
 }
 
 .bh-no-scrollbar::-webkit-scrollbar {
   display: none;
 }
+
 .bh-no-scrollbar {
   -ms-overflow-style: none;
   scrollbar-width: none;

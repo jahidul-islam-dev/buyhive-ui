@@ -7,9 +7,10 @@ import { cn } from "@/lib/utils"
 type FieldProps = InputHTMLAttributes<HTMLInputElement> & {
   label: string
   icon?: ReactNode
+  error?: string
 }
 
-export function Field({ label, icon, className, type = "text", id, ...props }: FieldProps) {
+export function Field({ label, icon, className, type = "text", id, error, ...props }: FieldProps) {
   const [show, setShow] = useState(false)
   const isPassword = type === "password"
   const inputType = isPassword ? (show ? "text" : "password") : type
@@ -29,10 +30,12 @@ export function Field({ label, icon, className, type = "text", id, ...props }: F
         <input
           id={fieldId}
           type={inputType}
+          aria-invalid={Boolean(error)}
           className={cn(
             "h-12 w-full rounded-xl border border-input bg-card px-3.5 text-sm text-foreground shadow-sm outline-none transition-colors placeholder:text-muted-foreground focus:border-primary focus:ring-2 focus:ring-primary/20",
             icon && "pl-10",
             isPassword && "pr-10",
+            error && "border-error focus:border-error focus:ring-error/20",
             className,
           )}
           {...props}
@@ -48,6 +51,7 @@ export function Field({ label, icon, className, type = "text", id, ...props }: F
           </button>
         )}
       </div>
+      {error ? <p className="text-xs text-error">{error}</p> : null}
     </div>
   )
 }

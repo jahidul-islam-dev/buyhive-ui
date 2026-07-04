@@ -1,13 +1,7 @@
-import { AppProvider } from "@/components/buyhive/app-context"
-import { AppShell } from "@/components/buyhive/app-shell"
-import { DeviceFrame } from "@/components/buyhive/device-frame"
+"use client"
 
-export default function Page() {
-  return (
-    <AppProvider>
-      <DeviceFrame>
-        <AppShell />
-      </DeviceFrame>
-    </AppProvider>
-  )
+import { SplashScreen } from "@/components/buyhive/screens/splash-screen"
+
+export default function SplashPage() {
+  return <SplashScreen />
 }

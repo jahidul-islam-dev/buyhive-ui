@@ -2,16 +2,16 @@
 
 import { useEffect } from "react"
 import { Loader2 } from "lucide-react"
-import { useApp } from "../app-context"
+import { useAppNav } from "@/hooks/use-app-nav"
 import { LogoMark } from "../logo"
 
 export function SplashScreen() {
-  const { navigate } = useApp()
+  const { goOnboarding } = useAppNav()
 
   useEffect(() => {
-    const t = setTimeout(() => navigate("onboarding"), 2200)
+    const t = setTimeout(() => goOnboarding(), 2200)
     return () => clearTimeout(t)
-  }, [navigate])
+  }, [goOnboarding])
 
   return (
     <div className="flex h-full flex-col items-center justify-center bg-primary px-8 text-center text-primary-foreground">

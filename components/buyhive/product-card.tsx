@@ -1,21 +1,20 @@
 "use client"
 
 import { Clock, Users } from "lucide-react"
+import Link from "next/link"
 import { money, progress, savings, type Product } from "@/lib/buyhive-data"
+import { routes } from "@/lib/constants/routes"
 import { ProgressBar, StatusBadge } from "./primitives"
-import { useApp } from "./app-context"
 import { cn } from "@/lib/utils"
 
 export function ProductCard({ product }: { product: Product }) {
-  const { navigate } = useApp()
   const pct = progress(product)
   const nearComplete = pct >= 80
 
   return (
-    <button
-      type="button"
-      onClick={() => navigate("product", { productId: product.id })}
-      className="group w-full overflow-hidden rounded-2xl border border-border bg-card text-left shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md active:scale-[0.99]"
+    <Link
+      href={routes.product(product.id)}
+      className="group bh-card-hover block w-full overflow-hidden rounded-2xl border border-border bg-card text-left shadow-sm active:scale-[0.99]"
     >
       <div className="relative aspect-[4/3] overflow-hidden bg-muted">
         <img
@@ -55,18 +54,16 @@ export function ProductCard({ product }: { product: Product }) {
           </span>
         </div>
       </div>
-    </button>
+    </Link>
   )
 }
 
 export function ProductRow({ product }: { product: Product }) {
-  const { navigate } = useApp()
   const pct = progress(product)
   return (
-    <button
-      type="button"
-      onClick={() => navigate("product", { productId: product.id })}
-      className="flex w-full items-center gap-3 rounded-2xl border border-border bg-card p-3 text-left shadow-sm transition-all hover:shadow-md active:scale-[0.99]"
+    <Link
+      href={routes.product(product.id)}
+      className="bh-card-hover flex w-full items-center gap-3 rounded-2xl border border-border bg-card p-3 text-left shadow-sm active:scale-[0.99]"
     >
       <div className="h-16 w-16 shrink-0 overflow-hidden rounded-xl bg-muted">
         <img
@@ -86,6 +83,6 @@ export function ProductRow({ product }: { product: Product }) {
         </div>
         <ProgressBar value={pct} tone={pct >= 80 ? "warning" : "primary"} />
       </div>
-    </button>
+    </Link>
   )
 }

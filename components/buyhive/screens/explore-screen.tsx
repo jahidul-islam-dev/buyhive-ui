@@ -34,7 +34,7 @@ export function ExploreScreen() {
   )
 
   return (
-    <div className="flex h-full flex-col">
+    <div className="bh-page-enter flex h-full flex-col">
       <header className="space-y-3 border-b border-border bg-card px-5 pb-3 pt-3">
         <div className="flex items-center justify-between">
           <Logo size="sm" />
@@ -48,8 +48,12 @@ export function ExploreScreen() {
         {filtered.length === 0 ? (
           <EmptyState
             icon={<Search className="h-7 w-7" />}
-            title="No deals found"
-            body="We couldn't find any group buys matching your search. Try a different keyword or category."
+            title={searching ? "No search results" : "No deals found"}
+            body={
+              searching
+                ? "Try a different keyword, category, or campus filter to uncover more deals."
+                : "We couldn't find any group buys matching your current view. Try changing the category or come back later."
+            }
           />
         ) : searching ? (
           <section>

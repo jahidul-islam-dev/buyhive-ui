@@ -30,7 +30,7 @@ export function GridSkeleton({ count = 4 }: { count?: number }) {
 
 export function InlineLoader({ label = "Loading..." }: { label?: string }) {
   return (
-    <div className="flex flex-col items-center justify-center gap-3 py-16 text-muted-foreground">
+    <div className="bh-animate-slide-in flex flex-col items-center justify-center gap-3 py-16 text-muted-foreground">
       <Loader2 className="h-7 w-7 animate-spin text-primary" />
       <p className="text-sm font-medium">{label}</p>
     </div>
@@ -49,13 +49,15 @@ export function EmptyState({
   action?: ReactNode
 }) {
   return (
-    <div className="flex flex-col items-center justify-center gap-3 px-6 py-16 text-center">
-      <div className="grid h-16 w-16 place-items-center rounded-2xl bg-muted text-muted-foreground">
-        {icon ?? <Inbox className="h-7 w-7" />}
+    <div className="rounded-[28px] border border-border/70 bg-gradient-to-br from-card via-card to-accent/20 p-6 shadow-sm">
+      <div className="mx-auto flex w-full max-w-[18rem] flex-col items-center justify-center gap-3 px-2 py-4 text-center">
+        <div className="grid h-20 w-20 place-items-center rounded-[24px] bg-primary/10 text-primary shadow-inner">
+          {icon ?? <Inbox className="h-8 w-8" />}
+        </div>
+        <h3 className="text-base font-bold text-foreground">{title}</h3>
+        <p className="text-sm text-muted-foreground text-pretty">{body}</p>
+        {action}
       </div>
-      <h3 className="text-base font-bold text-foreground">{title}</h3>
-      <p className="max-w-[15rem] text-sm text-muted-foreground text-pretty">{body}</p>
-      {action}
     </div>
   )
 }

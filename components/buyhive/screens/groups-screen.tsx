@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { MessageCircle, PackageOpen } from "lucide-react"
+import { MessageCircle, PackageOpen, Plus } from "lucide-react"
 import {
   getProduct,
   money,
@@ -9,7 +9,7 @@ import {
   progress,
   type GroupStatus,
 } from "@/lib/buyhive-data"
-import { useApp } from "../app-context"
+import { useAppNav } from "@/hooks/use-app-nav"
 import { Logo } from "../logo"
 import { ProgressBar, StatusBadge } from "../primitives"
 import { EmptyState } from "../states"
@@ -31,17 +31,27 @@ const statusTone: Record<GroupStatus, "primary" | "warning" | "success" | "muted
 }
 
 export function GroupsScreen() {
-  const { navigate } = useApp()
+  const { goExplore, goCreate, goProduct, goGroupChat } = useAppNav()
   const [tab, setTab] = useState<GroupStatus>("active")
 
   const list = myGroups.filter((g) => g.status === tab)
 
   return (
-    <div className="flex h-full flex-col">
+    <div className="bh-page-enter flex h-full flex-col">
       <header className="border-b border-border bg-card px-5 pb-2 pt-3">
         <div className="mb-3 flex items-center justify-between">
           <h1 className="text-lg font-bold text-foreground">My Groups</h1>
-          <Logo size="sm" showWordmark={false} />
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => goCreate()}
+              aria-label="Create group"
+              className="grid h-9 w-9 place-items-center rounded-full bg-primary text-primary-foreground shadow-md shadow-primary/25"
+            >
+              <Plus className="h-4 w-4" />
+            </button>
+            <Logo size="sm" showWordmark={false} />
+          </div>
         </div>
         <div className="-mx-5 flex gap-1 overflow-x-auto bh-no-scrollbar px-5">
           {tabs.map((t) => {
@@ -72,12 +82,17 @@ export function GroupsScreen() {
         {list.length === 0 ? (
           <EmptyState
             icon={<PackageOpen className="h-7 w-7" />}
-            title="No groups here"
+            title="No groups found"
             body={`You have no ${tab} groups yet. Explore deals to join or create one.`}
             action={
-              <Button className="mt-1" onClick={() => navigate("explore")}>
-                Explore deals
-              </Button>
+              <div className="flex flex-col gap-2">
+                <Button className="mt-1" onClick={() => goExplore()}>
+                  Explore deals
+                </Button>
+                <Button variant="outline" className="bg-transparent" onClick={() => goCreate()}>
+                  Create a group
+                </Button>
+              </div>
             }
           />
         ) : (
@@ -94,7 +109,7 @@ export function GroupsScreen() {
                   <div className="flex gap-3">
                     <button
                       type="button"
-                      onClick={() => navigate("product", { productId: p.id })}
+                      onClick={() => goProduct(p.id)}
                       className="h-16 w-16 shrink-0 overflow-hidden rounded-xl bg-muted"
                     >
                       <img
@@ -128,14 +143,14 @@ export function GroupsScreen() {
                       variant="outline"
                       size="sm"
                       className="flex-1 gap-1.5 bg-transparent"
-                      onClick={() => navigate("chat")}
+                      onClick={() => goGroupChat(g.id)}
                     >
                       <MessageCircle className="h-4 w-4" /> Chat
                     </Button>
                     <Button
                       size="sm"
                       className="flex-1"
-                      onClick={() => navigate("product", { productId: p.id })}
+                      onClick={() => goProduct(p.id)}
                     >
                       View
                     </Button>

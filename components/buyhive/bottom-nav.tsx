@@ -1,19 +1,14 @@
 "use client"
 
-import { Compass, Home, Plus, User, Users } from "lucide-react"
-import { useApp, type Screen } from "./app-context"
+import Link from "next/link"
+import { usePathname } from "next/navigation"
+import { TAB_ITEMS } from "@/config/navigation"
+import { getActiveTab } from "@/lib/constants/routes"
 import { cn } from "@/lib/utils"
 
-const items: { screen: Screen; label: string; icon: typeof Home }[] = [
-  { screen: "home", label: "Home", icon: Home },
-  { screen: "explore", label: "Explore", icon: Compass },
-  { screen: "create", label: "Create", icon: Plus },
-  { screen: "groups", label: "Groups", icon: Users },
-  { screen: "profile", label: "Profile", icon: User },
-]
-
 export function BottomNav() {
-  const { screen, navigate } = useApp()
+  const pathname = usePathname()
+  const activeTab = getActiveTab(pathname)
 
   return (
     <nav
@@ -21,43 +16,29 @@ export function BottomNav() {
       className="absolute inset-x-0 bottom-0 z-30 border-t border-border bg-card/95 backdrop-blur-md"
     >
       <ul className="flex items-stretch justify-around px-1 pb-[env(safe-area-inset-bottom)] pt-1.5">
-        {items.map((item) => {
-          const active = screen === item.screen
-          const isCreate = item.screen === "create"
+        {TAB_ITEMS.map((item) => {
+          const active = activeTab === item.href
           const Icon = item.icon
-          if (isCreate) {
-            return (
-              <li key={item.screen} className="flex flex-1 justify-center">
-                <button
-                  type="button"
-                  onClick={() => navigate(item.screen)}
-                  className="flex flex-col items-center gap-1 pt-0.5"
-                  aria-label="Create group"
-                >
-                  <span className="grid h-11 w-11 -translate-y-3 place-items-center rounded-2xl bg-primary text-primary-foreground shadow-lg shadow-primary/30 transition-transform active:scale-90">
-                    <Icon className="h-5 w-5" />
-                  </span>
-                  <span className="-mt-2 text-[10px] font-medium text-muted-foreground">
-                    {item.label}
-                  </span>
-                </button>
-              </li>
-            )
-          }
+
           return (
-            <li key={item.screen} className="flex-1">
-              <button
-                type="button"
-                onClick={() => navigate(item.screen)}
+            <li key={item.href} className="flex-1">
+              <Link
+                href={item.href}
+                replace
                 aria-current={active ? "page" : undefined}
                 className={cn(
-                  "flex w-full flex-col items-center gap-1 rounded-xl py-1.5 text-[10px] font-medium transition-colors",
-                  active ? "text-primary" : "text-muted-foreground hover:text-foreground",
+                  "flex w-full flex-col items-center gap-1 rounded-xl py-1.5 text-[10px] font-medium transition-all duration-200",
+                  active ? "bg-primary/10 text-primary" : "text-muted-foreground hover:bg-muted/70 hover:text-foreground",
                 )}
               >
-                <Icon className={cn("h-5 w-5 transition-transform", active && "scale-110")} />
+                <span className="relative">
+                  <Icon className={cn("h-5 w-5 transition-transform", active && "scale-110")} />
+                  {item.href === "/notifications" && (
+                    <span className="absolute -right-0.5 -top-0.5 h-2 w-2 rounded-full bg-error ring-2 ring-card" />
+                  )}
+                </span>
                 {item.label}
-              </button>
+              </Link>
             </li>
           )
         })}

@@ -1,13 +1,15 @@
 "use client"
 
 import { type FormEvent, useEffect, useRef, useState } from "react"
-import { ArrowLeft, Check, CheckCheck, Clock, Send, Users } from "lucide-react"
-import { chatMessages, type ChatMessage } from "@/lib/buyhive-data"
-import { useApp } from "../app-context"
+import { Check, CheckCheck, Clock, Send, Users } from "lucide-react"
+import { chatMessages, getProduct, myGroups, progress, type ChatMessage } from "@/lib/buyhive-data"
+import { BackButton } from "../back-button"
+import { routes } from "@/lib/constants/routes"
 import { cn } from "@/lib/utils"
 
-export function ChatScreen() {
-  const { goBack } = useApp()
+export function ChatScreen({ groupId }: { groupId: string }) {
+  const group = myGroups.find((g) => g.id === groupId)
+  const product = group ? getProduct(group.productId) : undefined
   const [messages, setMessages] = useState<ChatMessage[]>(chatMessages)
   const [draft, setDraft] = useState("")
   const endRef = useRef<HTMLDivElement>(null)
@@ -34,23 +36,21 @@ export function ChatScreen() {
     setDraft("")
   }
 
+  const title = product ? `${product.name} Group` : "Group Chat"
+  const subtitle = product
+    ? `${product.joinedMembers} of ${product.maxMembers} joined · ${progress(product)}% funded`
+    : "Group conversation"
+
   return (
-    <div className="flex h-full flex-col bg-muted/40">
+    <div className="bh-page-enter flex h-full flex-col bg-muted/40">
       <header className="flex items-center gap-3 border-b border-border bg-card px-4 py-2.5">
-        <button
-          type="button"
-          onClick={goBack}
-          aria-label="Go back"
-          className="grid h-9 w-9 place-items-center rounded-full text-foreground"
-        >
-          <ArrowLeft className="h-4 w-4" />
-        </button>
+        <BackButton fallback={routes.groups} className="border-0 bg-transparent shadow-none" />
         <div className="grid h-10 w-10 place-items-center rounded-full bg-primary/15 text-primary">
           <Users className="h-5 w-5" />
         </div>
         <div className="min-w-0 flex-1">
-          <p className="line-clamp-1 text-sm font-semibold text-foreground">Arduino Uno Group</p>
-          <p className="text-xs text-success">3 of 6 completed payment</p>
+          <p className="line-clamp-1 text-sm font-semibold text-foreground">{title}</p>
+          <p className="text-xs text-success">{subtitle}</p>
         </div>
       </header>
 
@@ -118,11 +118,6 @@ export function ChatScreen() {
         <input
           value={draft}
           onChange={(e) => setDraft(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === "Enter" && !e.nativeEvent.isComposing && e.keyCode !== 229) {
-              // allow default form submit
-            }
-          }}
           placeholder="Message the group..."
           aria-label="Message"
           className="h-11 flex-1 rounded-full border border-border bg-background px-4 text-sm text-foreground outline-none placeholder:text-muted-foreground focus:border-primary focus:ring-2 focus:ring-primary/20"
