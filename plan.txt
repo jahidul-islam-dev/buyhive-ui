@@ -1,0 +1,36 @@
+fundamental features:
+1. buy together 
+
+two types of campaigns
+1. same product
+2. from same vendor
+
+optional feature:
+1. reputation
+2. how much saved
+
+campaign same product:
+1. product name, image, price for one if baught single, price for one if bought in group
+2. original buying source (if online then link)
+3. how long this offer will stay? (minimum 1 hour gap)
+4. why should i group? some predefined checkbox? with optional custom msg
+5. product category
+
+campaign for same vendor:
+1. what product buyer is buying
+2. what other products available for this campaign
+3. a form to submit what other people would buy with this
+4. why should i group...
+5. shop category
+
+quesion?
+1. how we handle more people in a campaign? one product need 3 people. 6 is interested, now?
+two possible solution
+- we can buy same thing twice
+- if possible we take higher bulk offer.
+
+
+signup
+1. registration number & username
+2. verified via cr, new cr will be assigned via previous cr
+
