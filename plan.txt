@@ -1,36 +1,143 @@
-fundamental features:
-1. buy together 
+you role: ui/ux expert with minimalism, user friendly design with more info less click click. wireframe fidelity only, light mode. use material 3 widgets only - standard appbar/bottomnavigationbar/card/listtile, no custom painters, no lottie, no complex animations, no hero/shared-element animations across screens (no item staying visible across screen transitions). pretty basic, nothing fancy.
 
-two types of campaigns
-1. same product
-2. from same vendor
+# summary
+our app, cartmates, is exclusive to our university which serves as a platform to find buying partners. there are some offers where you can save buy ordering in higher quantity; but you don't need that much, then you can team up with someone who need that, and order as a group. our slogan is: buy together, save together.
 
-optional feature:
-1. reputation
-2. how much saved
+# screens (explicit list, design in this order)
+1. onboarding (3 intro cards + register/login/guest)
+2. register form (+ pending approval state)
+3. login
+4. home / catalog
+5. campaign detail - same product type
+6. campaign detail - same vendor type
+7. join form - same product
+8. join form - same vendor
+9. create campaign (type picker + both forms)
+10. my groups (passive/active toggle + list, horizontal status pills)
+11. passive group detail / order status
+12. active group management (host dashboard)
+13. notifications
+14. account / profile (includes statistics)
+15. reputation detail
+16. category picker (popup/modal)
 
-campaign same product:
-1. product name, image, price for one if baught single, price for one if bought in group
-2. original buying source (if online then link)
-3. how long this offer will stay? (minimum 1 hour gap)
-4. why should i group? some predefined checkbox? with optional custom msg
-5. product category
+optional/stretch, only if credits allow: dispute report screen (member files an issue against a campaign)
 
-campaign for same vendor:
-1. what product buyer is buying
-2. what other products available for this campaign
-3. a form to submit what other people would buy with this
-4. why should i group...
-5. shop category
+# member status vs campaign status (important distinction, applies everywhere below)
+campaign status = lifecycle of the whole campaign (recruiting, ordered, etc, see status system section).
+member status = where an individual person stands inside a campaign. three states:
+- interested: expressed interest, no payment made, doesn't count toward qty cap. only exists once qty cap is already full.
+- hold: paid, payment screenshot uploaded, waiting on host verification. counts toward qty cap.
+- confirmed: host verified the payment. counts toward qty cap.
+so cap progress = confirmed + hold. interested people sit outside the cap, waiting for a slot.
 
-quesion?
-1. how we handle more people in a campaign? one product need 3 people. 6 is interested, now?
-two possible solution
-- we can buy same thing twice
-- if possible we take higher bulk offer.
+# workflow
 
+## start
+there will be a onboarding with three detail cards as hey save on product cost, save on delivery, join student community etc random intro to our app. with a regiser button, login button. also to skip and use as a guest.
+### guest
+they can only browse, not create any group or join or anything.
+### already user
+they will join and use the app as described in other workflows
+### registration
+a form with their university registration no., and username and password. this user will be in pending and can browse like a guest. an admin or student volunteer will approve his account by actually verifying its him. as its exclusive for one campus it will be the easiest method.
 
-signup
-1. registration number & username
-2. verified via cr, new cr will be assigned via previous cr
+## home screen or catalog
+this will show campaigns. this will highlight rows with products such as campaigns close to reaching their qty target (needs 15 qty total, already have 12 between confirmed+hold), campaigns ending soon (time), campaigns with maximum savings in percentage. and then grid scroll of ai suggested items user might like. they can select top 5 categories as floating buttons before this grid.
+this page will also have a search bar. also a button for a popup of all categories to select from.
 
+## bottom navigation
+home, my groups, create, notifications, account
+
+## create campaign screen
+step 1: pick campaign type - same product or same vendor. two big simple tappable cards.
+
+### same product form
+image upload, product name (this is the campaign name), category, source (url or address), original price without group, price tiers (add tier: at X total qty reached, price per unit is Y - repeatable, tiers key off total qty not headcount), minimum qty to proceed, qty cap (host sets this, can raise it later from active group management), deadline date/time, pickup spot (text field, e.g. "meet at library gate"), campaign description (simple text block, why join / savings explanation), additional details box.
+
+no member-count field at creation - qty is the only limit mechanism. participant headcount is just derived/displayed, never something the host sets directly.
+
+### same vendor form
+title (vendor name or a specific ongoing offer, e.g. "aliexpress bundle deal"), vendor logo/thumbnail image, source/url, original price context, deadline (default and usually the only proceed condition), optional toggle "set a quantity target" - off by default, switch on only if the vendor deal actually needs a qty threshold (like an aliexpress bundle), which reveals a target qty field. pickup spot, campaign description (simple text block), additional details box. no price tiers here since price is resolved per-member at approval.
+
+## campaign detail screen
+### campaign type: same product
+image, name, host name, price per unit at current tier. category
+without group original price.
+qty progress: minimum qty to proceed, current qty (confirmed + hold), qty cap. small secondary line: participant counts (confirmed / hold / interested), kept less prominent than the qty numbers.
+price tiers list: at X qty reached, price becomes Y (repeat).
+source: from where the buyer will buy it. (this could be a link if online, or maybe address or whatever)
+deadline / countdown
+pickup spot (where host will hand off items)
+campaign description: a simple text block where the host explains the savings or reason to join
+updates section: one-way timestamped announcements from host only (e.g. "order placed today", "items arrived, pickup tomorrow 5pm"). not a status change, just a log.
+additional detail box where host add other needed informations as needed.
+comments: maybe someone has better source, or whatever, we need a communication that is not chat
+host reputation: name, image, quick summary - tapping opens reputation detail screen
+
+a sticky banner at bottom showing deadline countdown and qty progress. button label depends on member state: "join campaign" (qty cap not yet full) or "mark as interested" (qty cap full - no payment needed to express interest, host decides later if it matters, and this person gets auto-notified if a slot frees up).
+
+#### join form for same product
+qty he wants to buy, and he will see a payment detail, he will make payment, and add screenshot of that payment. he will be marked as hold, and this payment verification will be passed to host. if the qty cap is already full when they try to join, this form is skipped entirely and they instead go through mark-as-interested (no payment, just a confirm).
+
+### campaign type: same vendor
+vendor logo or offer thumbnail image, host name. why this campaign. deadline, pickup spot, additional informations. optional qty target progress if the host enabled it at creation, otherwise just deadline countdown. members and other generic.
+
+#### join form for same vendor
+repeatable product line item: image of what product you want to buy, how much, additional instruction - with a "+ add another product" button to request more than one item in the same submission. each line item goes to host for individual approval (some items in one submission might be available, others not). after per-item approval i see payment detail per approved item, make payment, add screenshot, marked as hold, host verifies, then confirmed.
+
+## my groups screen
+segmented toggle: passive (campaigns i'm in) / active (campaigns i host). horizontal scrollable status pills at top of the list for quick filtering. floating status filter buttons can be dropped in favor of the pills - pills do the same job faster.
+
+### passive group screen
+list of campaigns i'm involved in - my qty (if hold/confirmed) or just "interested" tag, my member status badge (interested / hold / confirmed), short campaign status info. horizontal status pills to filter.
+tapping a confirmed/hold campaign opens the order status screen. tapping an interested campaign opens the regular campaign detail screen (nothing to track yet, they haven't actually joined).
+
+### passive group detail / order status screen
+opens when tapping a hold/confirmed campaign from passive list. shows a simple vertical timeline of status changes and host updates combined. host contact info. a "confirm receipt" button, shown once status is arrived/ready-for-pickup, tapped by member once they've physically gotten their item.
+
+### active group screen
+list of campaigns i am hosting. horizontal status pills to filter.
+
+### active group management screen
+opens when tapping a campaign from active list. host can: raise the qty cap (non-destructive), other non-destructive edits, post one-way updates (see updates section above), change campaign status, add tracking number/link once ordered.
+member list with three tabs: confirmed / hold / interested.
+- hold tab: approve or reject payment screenshot. rejecting immediately frees a slot and auto-notifies the interested pool that a slot opened.
+- interested tab: just a waiting list, host can see who's watching, no action required unless a slot frees up (system handles the notify).
+
+## campaign status system
+forward path: recruiting -> ordered -> arrived/ready for pickup -> completed
+failure branches off recruiting:
+- failed - not enough qty/members: deadline hit, minimum not reached. no host fault, no penalty, auto-trigger refund flow for any hold-member payments already made.
+- failed - host fault: minimum was reached but host didn't deliver/order/disappeared. triggers dispute -> refunded flow. penalty applies per reputation rules.
+cancelled: host manually pulls the campaign before it's ordered, discretionary, rare case.
+updates (see above) are separate from status - they don't change status, just log announcements on the timeline.
+reminder: this is campaign-level status, separate from member-level status (interested/hold/confirmed) described earlier.
+
+## notifications screen
+simple list view of system alerts - new member joined, payment verified/rejected, a slot opened and you're on the interested list, status changed, host posted an update, deadline approaching, dispute resolved, etc.
+
+## account screen
+trimmed down now that my groups owns the campaign lists. this screen is just: profile picture, name, editable fields. statistics section: two simple metric cards showing "total money saved" and "total campaigns joined". reputation summary (tap through to reputation detail screen).
+
+## reputation detail screen
+header: profile photo, name, role badge (regular/cr/admin), reputation score.
+two stat rows: campaigns hosted/completed, campaigns joined.
+simple chronological history list of past campaigns with a status icon each.
+
+## account type
+1. regular
+2. cr, they can approve new member, transfer his cr-ship. total number of cr is limited by admins
+3. admin will dispute or assign cr for dispute. create new cr. and maybe everything, supreme.
+
+# payment trust model
+payment happens directly to host at join time (member pays, uploads screenshot, host verifies, member marked hold then confirmed). interested members don't pay anything upfront. exclusive-campus model keeps this low-friction and personally accountable - each member is personally verified at registration. if a campaign fails (either failure type above), host is expected to refund hold/confirmed member payments; host-fault failures route through dispute.
+
+# reputation
+1. if host fails to order on time but had reached the minimum qty/members (failed - host fault), then for each confirmed member one point penalty.
+2. for each successful order (completed status), one point for each confirmed member.
+3. unless one has successfully disputed all issues such as refunding failed campaigns or anything scammy, he cant neither create any other campaigns nor participate in any campaigns.
+this is on business logic rather than ui ux, just keep in mind reputation numbers need to show up on host reputation summary (campaign detail) and reputation detail screen.
+
+# empty states
+keep minimal - icon + one line of text is enough for any empty list (no campaigns joined, no notifications, no history). don't over-design these.
